@@ -19,7 +19,7 @@
       <a href="queue.html" class="nav-link active">My Queue</a>
       <a href="history.html" class="nav-link">Orders</a>
     </div>
-      <div class="nav-right">
+    <div class="nav-right">
       <button class="cart-btn" id="cartBtn" onclick="window.location='index.html'">
         <span class="cart-icon">🛒</span>
         <span class="cart-badge" id="cartBadge">0</span>
@@ -30,24 +30,25 @@
 
   <main class="queue-page">
 
-    <!-- No active order state -->
+    <!-- Multi-stall tabs -->
+    <div class="stall-tabs-wrap" id="stallTabsWrap" style="display:none"></div>
+
+    <!-- No active order -->
     <div id="noOrderState" class="empty-state" style="display:none">
       <div class="empty-icon">🍽️</div>
       <h2>No active orders</h2>
-      <p>Order something delicious and track your queue here!</p>
+      <p>Order something delicious and track it here!</p>
       <a href="index.html" class="btn-primary">Browse Menu</a>
     </div>
 
-    <!-- Active order state -->
+    <!-- Active order -->
     <div id="activeOrderState">
 
-      <!-- Status Banner -->
       <div class="status-banner" id="statusBanner">
         <div class="status-dot" id="statusDot"></div>
         <span id="statusText">Preparing your order...</span>
       </div>
 
-      <!-- Queue Card -->
       <div class="queue-card">
         <div class="queue-card-top">
           <div class="queue-info">
@@ -67,7 +68,6 @@
             </div>
           </div>
         </div>
-
         <div class="queue-stats">
           <div class="stat-box">
             <span class="stat-icon">👥</span>
@@ -87,7 +87,6 @@
         </div>
       </div>
 
-      <!-- Countdown Timer -->
       <div class="timer-card" id="timerCard">
         <p class="timer-label">Estimated time remaining</p>
         <div class="countdown" id="countdown">--:--</div>
@@ -97,7 +96,6 @@
         <p class="timer-hint" id="timerHint">Queue is moving...</p>
       </div>
 
-      <!-- Order Details Accordion -->
       <div class="order-details-card">
         <button class="accordion-btn" onclick="toggleAccordion()">
           <span>Order Details</span>
@@ -112,13 +110,12 @@
         </div>
       </div>
 
-      <!-- Live Feed -->
       <div class="live-feed-card">
         <h3>🔴 Live Queue Feed</h3>
         <div class="feed-list" id="feedList"></div>
       </div>
 
-      <!-- Ready notification zone -->
+      <!-- Ready card (photo upload injected here by JS) -->
       <div class="ready-card" id="readyCard" style="display:none">
         <div class="ready-animation">🎉</div>
         <h2>Your order is ready!</h2>
@@ -134,6 +131,8 @@
   <script src="js/auth.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/queue.js"></script>
+  <script src="js/notify.js"></script>
+  <script src="js/chatbot.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const s = requireAuth(['student']);
