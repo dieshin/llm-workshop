@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Queue — CanteenGo</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🍱</span>
+      <span class="brand-name">CanteenGo</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link" data-page="menu">Menu</a>
+      <a href="queue.html" class="nav-link active" data-page="queue">My Queue</a>
+      <a href="history.html" class="nav-link" data-page="history">Orders</a>
+    </div>
+    <button class="cart-btn" id="cartBtn" onclick="window.location='index.html'">
+      <span class="cart-icon">🛒</span>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </nav>
+
+  <main class="queue-page">
+
+    <!-- No active order state -->
+    <div id="noOrderState" class="empty-state" style="display:none">
+      <div class="empty-icon">🍽️</div>
+      <h2>No active orders</h2>
+      <p>Order something delicious and track your queue here!</p>
+      <a href="index.html" class="btn-primary">Browse Menu</a>
+    </div>
+
+    <!-- Active order state -->
+    <div id="activeOrderState">
+
+      <!-- Status Banner -->
+      <div class="status-banner" id="statusBanner">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Preparing your order...</span>
+      </div>
+
+      <!-- Queue Card -->
+      <div class="queue-card">
+        <div class="queue-card-top">
+          <div class="queue-info">
+            <p class="queue-card-label">Queue Number</p>
+            <div class="queue-number-large" id="queueNumberDisplay">#--</div>
+            <p class="queue-stall-name" id="queueStallDisplay">--</p>
+          </div>
+          <div class="queue-ring-wrap">
+            <svg class="ring-svg" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="50"/>
+              <circle class="ring-progress" id="ringProgress" cx="60" cy="60" r="50"
+                stroke-dasharray="314" stroke-dashoffset="314"/>
+            </svg>
+            <div class="ring-center">
+              <span class="ring-pos" id="ringPosition">--</span>
+              <span class="ring-pos-label">ahead</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="queue-stats">
+          <div class="stat-box">
+            <span class="stat-icon">👥</span>
+            <span class="stat-value" id="statAhead">--</span>
+            <span class="stat-label">People Ahead</span>
+          </div>
+          <div class="stat-box highlight">
+            <span class="stat-icon">⏱️</span>
+            <span class="stat-value" id="statEta">--</span>
+            <span class="stat-label">Est. Wait</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-icon">🔢</span>
+            <span class="stat-value" id="statCurrent">--</span>
+            <span class="stat-label">Now Serving</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Countdown Timer -->
+      <div class="timer-card" id="timerCard">
+        <p class="timer-label">Estimated time remaining</p>
+        <div class="countdown" id="countdown">--:--</div>
+        <div class="timer-bar-wrap">
+          <div class="timer-bar" id="timerBar"></div>
+        </div>
+        <p class="timer-hint" id="timerHint">Queue is moving...</p>
+      </div>
+
+      <!-- Order Details Accordion -->
+      <div class="order-details-card">
+        <button class="accordion-btn" onclick="toggleAccordion()">
+          <span>Order Details</span>
+          <span id="accordionArrow">▼</span>
+        </button>
+        <div class="accordion-body" id="accordionBody">
+          <div id="queueOrderItems"></div>
+          <div class="order-total-row">
+            <span>Total Paid</span>
+            <strong id="queueOrderTotal">--</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Feed -->
+      <div class="live-feed-card">
+        <h3>🔴 Live Queue Feed</h3>
+        <div class="feed-list" id="feedList"></div>
+      </div>
+
+      <!-- Ready notification zone -->
+      <div class="ready-card" id="readyCard" style="display:none">
+        <div class="ready-animation">🎉</div>
+        <h2>Your order is ready!</h2>
+        <p>Pick up at <strong id="readyStall">--</strong></p>
+        <button class="btn-collected" onclick="markCollected()">Mark as Collected ✓</button>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/queue.js"></script>
+</body>
+</html>

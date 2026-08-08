@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CanteenGo — Student Survival Kit</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ===== NAV ===== -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🍱</span>
+      <span class="brand-name">CanteenGo</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link active" data-page="menu">Menu</a>
+      <a href="queue.html" class="nav-link" data-page="queue">My Queue</a>
+      <a href="history.html" class="nav-link" data-page="history">Orders</a>
+    </div>
+    <button class="cart-btn" id="cartBtn" onclick="openCart()">
+      <span class="cart-icon">🛒</span>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Skip the Line,<br/><span class="accent">Not the Food.</span></h1>
+      <p>Order ahead, track your queue, pick up when it's ready.</p>
+    </div>
+    <div class="hero-stalls">
+      <button class="stall-chip active" data-stall="all" onclick="filterStall(this)">🍽️ All</button>
+      <button class="stall-chip" data-stall="rice" onclick="filterStall(this)">🍚 Rice Station</button>
+      <button class="stall-chip" data-stall="noodles" onclick="filterStall(this)">🍜 Noodle Bar</button>
+      <button class="stall-chip" data-stall="snacks" onclick="filterStall(this)">🥪 Snack Corner</button>
+      <button class="stall-chip" data-stall="drinks" onclick="filterStall(this)">🧋 Drinks</button>
+    </div>
+  </section>
+
+  <!-- ===== MENU GRID ===== -->
+  <main class="menu-container">
+    <div class="menu-grid" id="menuGrid"></div>
+  </main>
+
+  <!-- ===== CART DRAWER ===== -->
+  <div class="overlay" id="overlay" onclick="closeCart()"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+      <h2>Your Order</h2>
+      <button class="close-btn" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty">
+        <span>🛒</span>
+        <p>Nothing here yet.<br/>Add something delicious!</p>
+      </div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cartTotal">RM 0.00</span>
+      </div>
+      <button class="btn-checkout" onclick="goCheckout()">Proceed to Checkout →</button>
+    </div>
+  </aside>
+
+  <!-- ===== CHECKOUT MODAL ===== -->
+  <div class="modal-overlay" id="checkoutOverlay">
+    <div class="modal checkout-modal">
+      <div class="modal-header">
+        <h2>Checkout</h2>
+        <button class="close-btn" onclick="closeCheckout()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="order-summary" id="orderSummary"></div>
+        <div class="checkout-form">
+          <label>Your Name</label>
+          <input type="text" id="customerName" placeholder="e.g. Aisha" maxlength="30" />
+          <label>Pickup Time Preference</label>
+          <select id="pickupTime">
+            <option value="asap">ASAP (next in queue)</option>
+            <option value="10">In 10 minutes</option>
+            <option value="15">In 15 minutes</option>
+            <option value="20">In 20 minutes</option>
+          </select>
+          <div class="payment-section">
+            <label>Payment Method</label>
+            <div class="payment-methods">
+              <button class="pay-method active" data-method="ewallet" onclick="selectPayment(this)">📱 eWallet</button>
+              <button class="pay-method" data-method="cash" onclick="selectPayment(this)">💵 Cash on Pickup</button>
+              <button class="pay-method" data-method="card" onclick="selectPayment(this)">💳 Card</button>
+            </div>
+          </div>
+          <div class="ewallet-mock" id="ewalletSection">
+            <div class="qr-mock">
+              <div class="qr-placeholder">
+                <div class="qr-grid"></div>
+                <p class="qr-label">Mock QR Code</p>
+              </div>
+              <p class="qr-hint">Scan with Touch 'n Go / GrabPay / Boost</p>
+            </div>
+          </div>
+        </div>
+        <div class="checkout-total">
+          <span>Total to pay</span>
+          <strong id="checkoutTotal">SGD 0.00</strong>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-place-order" id="placeOrderBtn" onclick="placeOrder()">
+          Place Order 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ORDER SUCCESS MODAL ===== -->
+  <div class="modal-overlay" id="successOverlay">
+    <div class="modal success-modal">
+      <div class="success-animation">
+        <div class="success-circle">✓</div>
+      </div>
+      <h2>Order Placed!</h2>
+      <div class="queue-number-display">
+        <p class="queue-label">Your Queue Number</p>
+        <div class="queue-big" id="successQueueNum">#042</div>
+      </div>
+      <p class="success-hint">Head to <strong id="successStall">Rice Station</strong> when called.<br/>We'll notify you when it's ready!</p>
+      <div class="success-eta">
+        <span>⏱️ Estimated wait:</span>
+        <strong id="successEta">12 mins</strong>
+      </div>
+      <button class="btn-track" onclick="goToQueue()">Track My Order →</button>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/checkout.js"></script>
+</body>
+</html>

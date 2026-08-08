@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order History — CanteenGo</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🍱</span>
+      <span class="brand-name">CanteenGo</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link" data-page="menu">Menu</a>
+      <a href="queue.html" class="nav-link" data-page="queue">My Queue</a>
+      <a href="history.html" class="nav-link active" data-page="history">Orders</a>
+    </div>
+    <button class="cart-btn" onclick="window.location='index.html'">
+      <span class="cart-icon">🛒</span>
+    </button>
+  </nav>
+
+  <main class="history-page">
+    <div class="page-header">
+      <h1>Order History</h1>
+      <button class="btn-clear-history" onclick="clearHistory()">Clear All</button>
+    </div>
+
+    <div id="historyEmpty" class="empty-state" style="display:none">
+      <div class="empty-icon">📋</div>
+      <h2>No orders yet</h2>
+      <p>Your past orders will appear here.</p>
+      <a href="index.html" class="btn-primary">Start Ordering</a>
+    </div>
+
+    <div class="history-list" id="historyList"></div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/history.js"></script>
+</body>
+</html>
