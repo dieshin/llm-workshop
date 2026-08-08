@@ -17,21 +17,33 @@
       <span class="brand-name">CanteenGo</span>
     </div>
     <div class="nav-links">
-      <a href="index.html" class="nav-link active" data-page="menu">Menu</a>
-      <a href="queue.html" class="nav-link" data-page="queue">My Queue</a>
-      <a href="history.html" class="nav-link" data-page="history">Orders</a>
+      <a href="index.html" class="nav-link active">Menu</a>
+      <a href="queue.html" class="nav-link">My Queue</a>
+      <a href="history.html" class="nav-link">Orders</a>
     </div>
-    <button class="cart-btn" id="cartBtn" onclick="openCart()">
-      <span class="cart-icon">🛒</span>
-      <span class="cart-badge" id="cartBadge">0</span>
-    </button>
+    <div class="nav-right">
+      <div class="nav-points-wrap" onclick="openSpinWheel()" title="Lucky Spin">
+        <span class="nav-points-icon">🏅</span>
+        <span id="pointsBadge" class="nav-points-val">0 pts</span>
+      </div>
+      <button class="cart-btn" id="cartBtn" onclick="openCart()">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
   </nav>
+
+  <!-- ===== WEATHER BANNER ===== -->
+  <div class="weather-banner" id="weatherBanner"></div>
 
   <!-- ===== HERO ===== -->
   <section class="hero">
-    <div class="hero-content">
-      <h1>Skip the Line,<br/><span class="accent">Not the Food.</span></h1>
-      <p>Order ahead, track your queue, pick up when it's ready.</p>
+    <div class="hero-top">
+      <div class="hero-content">
+        <h1>Skip the Queue,<br/><span class="accent">Not the Flavour.</span></h1>
+        <p>Order ahead · Earn points · Pick up when ready</p>
+      </div>
+      <button class="spin-hero-btn" id="spinBtn" onclick="openSpinWheel()">🎰 Daily Spin</button>
     </div>
     <div class="hero-stalls">
       <button class="stall-chip active" data-stall="all" onclick="filterStall(this)">🍽️ All</button>
@@ -42,10 +54,38 @@
     </div>
   </section>
 
+  <!-- ===== CROWD HEATMAP ===== -->
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2 class="section-title">🔥 Stall Busyness</h2>
+      <span class="section-sub">Live · updated now</span>
+    </div>
+    <div class="stall-heatmap" id="stallHeatmap"></div>
+  </div>
+
+  <!-- ===== ORDER AGAIN STRIP ===== -->
+  <div class="order-again-strip" id="orderAgainStrip" style="display:none">
+    <span class="order-again-icon">🔁</span>
+    <span id="orderAgainLabel" class="order-again-label"></span>
+    <button class="order-again-btn" onclick="reorderLast()">Order Again</button>
+  </div>
+
+  <!-- ===== STUDY BREAK COMBOS ===== -->
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2 class="section-title">📚 Study Break Combos</h2>
+      <span class="section-sub">Bundled & discounted</span>
+    </div>
+    <div class="combo-strip" id="comboStrip"></div>
+  </div>
+
   <!-- ===== MENU GRID ===== -->
-  <main class="menu-container">
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2 class="section-title">🍽️ Menu</h2>
+    </div>
     <div class="menu-grid" id="menuGrid"></div>
-  </main>
+  </div>
 
   <!-- ===== CART DRAWER ===== -->
   <div class="overlay" id="overlay" onclick="closeCart()"></div>
@@ -61,9 +101,10 @@
       </div>
     </div>
     <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-nutrition-bar" id="cartNutritionBar"></div>
       <div class="cart-total">
         <span>Total</span>
-        <span id="cartTotal">RM 0.00</span>
+        <span id="cartTotal">S$0.00</span>
       </div>
       <button class="btn-checkout" onclick="goCheckout()">Proceed to Checkout →</button>
     </div>
@@ -78,10 +119,15 @@
       </div>
       <div class="modal-body">
         <div class="order-summary" id="orderSummary"></div>
+
+        <!-- Points redeem -->
+        <div class="checkout-section-label">🏅 Loyalty Points</div>
+        <div id="pointsRedeemSection"></div>
+
         <div class="checkout-form">
           <label>Your Name</label>
-          <input type="text" id="customerName" placeholder="e.g. Aisha" maxlength="30" />
-          <label>Pickup Time Preference</label>
+          <input type="text" id="customerName" placeholder="e.g. Wei Ling" maxlength="30" />
+          <label>Pickup Preference</label>
           <select id="pickupTime">
             <option value="asap">ASAP (next in queue)</option>
             <option value="10">In 10 minutes</option>
@@ -91,9 +137,9 @@
           <div class="payment-section">
             <label>Payment Method</label>
             <div class="payment-methods">
-              <button class="pay-method active" data-method="ewallet" onclick="selectPayment(this)">📱 eWallet</button>
-              <button class="pay-method" data-method="cash" onclick="selectPayment(this)">💵 Cash on Pickup</button>
-              <button class="pay-method" data-method="card" onclick="selectPayment(this)">💳 Card</button>
+              <button class="pay-method active" data-method="paynow" onclick="selectPayment(this)">📱 PayNow</button>
+              <button class="pay-method" data-method="cash" onclick="selectPayment(this)">💵 Cash</button>
+              <button class="pay-method" data-method="card" onclick="selectPayment(this)">💳 NETS/Card</button>
             </div>
           </div>
           <div class="ewallet-mock" id="ewalletSection">
@@ -102,13 +148,29 @@
                 <div class="qr-grid"></div>
                 <p class="qr-label">Mock QR Code</p>
               </div>
-              <p class="qr-hint">Scan with Touch 'n Go / GrabPay / Boost</p>
+              <p class="qr-hint">Scan with PayNow / GrabPay / DBS PayLah!</p>
             </div>
           </div>
         </div>
-        <div class="checkout-total">
-          <span>Total to pay</span>
-          <strong id="checkoutTotal">SGD 0.00</strong>
+
+        <!-- Totals -->
+        <div class="checkout-totals-block">
+          <div class="checkout-total-row">
+            <span>Subtotal</span>
+            <span id="checkoutSubtotal">S$0.00</span>
+          </div>
+          <div class="checkout-total-row discount-row" id="discountRow" style="display:none">
+            <span id="discountLabel" class="discount-label">Discount</span>
+            <span id="discountAmount" class="discount-amount">−S$0.00</span>
+          </div>
+          <div class="checkout-total-row total-final">
+            <span>Total</span>
+            <strong id="checkoutTotal">S$0.00</strong>
+          </div>
+          <div class="checkout-meta-row">
+            <span id="checkoutCals" class="meta-cal"></span>
+            <span id="checkoutPtsEarn" class="meta-pts"></span>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -119,23 +181,41 @@
     </div>
   </div>
 
-  <!-- ===== ORDER SUCCESS MODAL ===== -->
+  <!-- ===== SUCCESS MODAL ===== -->
   <div class="modal-overlay" id="successOverlay">
     <div class="modal success-modal">
-      <div class="success-animation">
-        <div class="success-circle">✓</div>
-      </div>
+      <div class="success-animation"><div class="success-circle">✓</div></div>
       <h2>Order Placed!</h2>
       <div class="queue-number-display">
         <p class="queue-label">Your Queue Number</p>
         <div class="queue-big" id="successQueueNum">#042</div>
       </div>
-      <p class="success-hint">Head to <strong id="successStall">Rice Station</strong> when called.<br/>We'll notify you when it's ready!</p>
+      <p class="success-hint">Pick up at <strong id="successStall">Rice Station</strong> when called.</p>
       <div class="success-eta">
-        <span>⏱️ Estimated wait:</span>
+        <span>⏱️ Est. wait:</span>
         <strong id="successEta">12 mins</strong>
       </div>
+      <div class="success-pts" id="successPtsEarned"></div>
       <button class="btn-track" onclick="goToQueue()">Track My Order →</button>
+    </div>
+  </div>
+
+  <!-- ===== SPIN WHEEL MODAL ===== -->
+  <div class="modal-overlay" id="spinOverlay">
+    <div class="modal spin-modal">
+      <div class="modal-header">
+        <h2>🎰 Daily Lucky Spin</h2>
+        <button class="close-btn" onclick="closeSpinWheel()">✕</button>
+      </div>
+      <div class="modal-body spin-body">
+        <p class="spin-subtitle">One spin per day — win discounts or bonus points!</p>
+        <div class="spin-wheel-wrap">
+          <div class="spin-pointer">▼</div>
+          <canvas id="spinCanvas" width="280" height="280"></canvas>
+        </div>
+        <div class="spin-result" id="spinResult" style="display:none"></div>
+        <button class="btn-spin" id="doSpinBtn" onclick="spinWheel()">🎰 SPIN!</button>
+      </div>
     </div>
   </div>
 
@@ -144,5 +224,6 @@
   <script src="js/menu.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/checkout.js"></script>
+  <script src="js/spin.js"></script>
 </body>
 </html>

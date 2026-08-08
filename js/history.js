@@ -4,31 +4,38 @@ function renderHistory() {
   const history = Store.getHistory();
   const listEl = document.getElementById('historyList');
   const emptyEl = document.getElementById('historyEmpty');
+  const statsEl = document.getElementById('historyStats');
 
   if (!listEl) return;
 
   if (history.length === 0) {
     listEl.innerHTML = '';
     if (emptyEl) emptyEl.style.display = 'block';
+    if (statsEl) statsEl.style.display = 'none';
     return;
   }
 
   if (emptyEl) emptyEl.style.display = 'none';
 
+  // Stats summary
+  if (statsEl) {
+    const totalSpent = history.reduce((s, o) => s + o.total, 0);
+    const totalOrders = history.length;
+    const totalPts = Store.getPoints();
+    statsEl.style.display = 'grid';
+    document.getElementById('statTotalSpent').textContent = Store.formatPrice(totalSpent);
+    document.getElementById('statTotalOrders').textContent = totalOrders;
+    document.getElementById('statTotalPts').textContent = `${totalPts} pts`;
+  }
+
   listEl.innerHTML = history.map(order => {
     const date = new Date(order.placedAt);
-    const dateStr = date.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' });
-    const timeStr = date.toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' });
-
-    const itemsSummary = order.items
-      .map(i => `${i.emoji} ${i.name} ×${i.qty}`)
-      .join(' · ');
-
-    const statusLabel = {
-      preparing: 'Preparing',
-      ready: 'Ready',
-      collected: 'Collected'
-    }[order.status] || order.status;
+    const dateStr = date.toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeStr = date.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' });
+    const itemsSummary = order.items.map(i => `${i.emoji} ${i.name} ×${i.qty}`).join(' · ');
+    const statusLabel = { preparing: 'Preparing', ready: 'Ready', collected: 'Collected' }[order.status] || order.status;
+    const calInfo = order.totalCal ? `<span class="history-cal">🔥 ${order.totalCal} cal</span>` : '';
+    const ptsInfo = order.ptsEarned ? `<span class="history-pts">+${order.ptsEarned} pts</span>` : '';
 
     return `
       <div class="history-card">
@@ -40,24 +47,22 @@ function renderHistory() {
           <span class="history-status ${order.status}">${statusLabel}</span>
         </div>
         <div class="history-items">${itemsSummary}</div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+        <div class="history-card-footer">
+          <div class="history-meta">${calInfo}${ptsInfo}</div>
           <div class="history-total">${Store.formatPrice(order.total)}</div>
-          <button class="btn-reorder" onclick="reorder(${JSON.stringify(order.items).replace(/"/g, '&quot;')})">
-            🔁 Reorder
-          </button>
         </div>
+        <button class="btn-reorder" onclick="reorder(${JSON.stringify(order.items).replace(/"/g, '&quot;')})">
+          🔁 Order Again
+        </button>
       </div>`;
   }).join('');
 }
 
 function reorder(items) {
-  // Add items back to cart
   const cart = [];
   items.forEach(i => {
     const menuItem = MENU_ITEMS.find(m => m.id === i.id);
-    if (menuItem && !menuItem.soldOut) {
-      cart.push({ id: i.id, qty: i.qty });
-    }
+    if (menuItem && !menuItem.soldOut) cart.push({ id: i.id, qty: i.qty });
   });
   Store.saveCart(cart);
   showToast('Items added to cart! 🛒');
