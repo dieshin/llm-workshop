@@ -19,11 +19,12 @@
       <a href="queue.html" class="nav-link active">My Queue</a>
       <a href="history.html" class="nav-link">Orders</a>
     </div>
-    <div class="nav-right">
+      <div class="nav-right">
       <button class="cart-btn" id="cartBtn" onclick="window.location='index.html'">
         <span class="cart-icon">🛒</span>
         <span class="cart-badge" id="cartBadge">0</span>
       </button>
+      <div id="navUserWrap" class="nav-user-wrap"></div>
     </div>
   </nav>
 
@@ -130,7 +131,15 @@
 
   <script src="js/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/queue.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const s = requireAuth(['student']);
+      if (!s) return;
+      renderNavSession();
+    });
+  </script>
 </body>
 </html>

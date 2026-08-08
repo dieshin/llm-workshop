@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stall Dashboard — CanteenGo</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🍱</span>
+      <span class="brand-name">CanteenGo</span>
+    </div>
+    <div class="nav-links">
+      <a href="stall.html" class="nav-link active">Dashboard</a>
+      <a href="stall-menu.html" class="nav-link" id="manageMenuLink">Manage Menu</a>
+    </div>
+    <div class="nav-right" id="navUserWrap"></div>
+  </nav>
+
+  <!-- ===== STALL HEADER ===== -->
+  <div class="stall-header">
+    <div class="stall-header-left">
+      <div class="stall-avatar" id="stallAvatar">🍚</div>
+      <div>
+        <h1 class="stall-title" id="stallTitle">Rice Station</h1>
+        <div class="stall-meta">
+          <span class="stall-status-badge open" id="stallStatusBadge">● Open</span>
+          <span class="stall-meta-sep">·</span>
+          <span id="stallStaffName">Staff</span>
+        </div>
+      </div>
+    </div>
+    <div class="stall-header-right">
+      <button class="btn-toggle-stall open" id="toggleStallBtn" onclick="toggleStallOpen()">
+        Close Stall
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== STATS ROW ===== -->
+  <div class="stall-stats-row">
+    <div class="stall-stat-card">
+      <span class="stall-stat-icon">📋</span>
+      <span class="stall-stat-value" id="statPending">0</span>
+      <span class="stall-stat-label">Pending</span>
+    </div>
+    <div class="stall-stat-card">
+      <span class="stall-stat-icon">👨‍🍳</span>
+      <span class="stall-stat-value" id="statPreparing">0</span>
+      <span class="stall-stat-label">Preparing</span>
+    </div>
+    <div class="stall-stat-card highlight">
+      <span class="stall-stat-icon">✅</span>
+      <span class="stall-stat-value" id="statReady">0</span>
+      <span class="stall-stat-label">Ready</span>
+    </div>
+    <div class="stall-stat-card">
+      <span class="stall-stat-icon">📦</span>
+      <span class="stall-stat-value" id="statDone">0</span>
+      <span class="stall-stat-label">Collected</span>
+    </div>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="stall-main">
+
+    <!-- LEFT: Active Orders -->
+    <section class="stall-orders-section">
+
+      <!-- Filter tabs -->
+      <div class="order-filter-tabs">
+        <button class="order-filter-tab active" data-filter="preparing" onclick="filterOrders(this)">
+          🔥 Active
+        </button>
+        <button class="order-filter-tab" data-filter="ready" onclick="filterOrders(this)">
+          ✅ Ready
+        </button>
+        <button class="order-filter-tab" data-filter="collected" onclick="filterOrders(this)">
+          📦 Collected
+        </button>
+        <button class="order-filter-tab" data-filter="all" onclick="filterOrders(this)">
+          All
+        </button>
+      </div>
+
+      <!-- Orders list -->
+      <div class="stall-order-list" id="stallOrderList">
+        <div class="stall-empty">
+          <span>🎉</span>
+          <p>No active orders right now.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Queue Control Panel -->
+    <aside class="stall-queue-panel">
+      <h2 class="panel-title">Queue Control</h2>
+
+      <!-- Now Serving -->
+      <div class="now-serving-card">
+        <p class="now-serving-label">Now Serving</p>
+        <div class="now-serving-num" id="nowServingNum">#038</div>
+        <div class="now-serving-controls">
+          <button class="btn-queue-action secondary" onclick="adjustServing(-1)">−</button>
+          <button class="btn-queue-action primary" onclick="callNext()">
+            Call Next ▶
+          </button>
+          <button class="btn-queue-action secondary" onclick="adjustServing(1)">+</button>
+        </div>
+      </div>
+
+      <!-- Queue overview -->
+      <div class="queue-overview">
+        <div class="queue-ov-row">
+          <span>Next in queue</span>
+          <strong id="queueNext">--</strong>
+        </div>
+        <div class="queue-ov-row">
+          <span>Total waiting</span>
+          <strong id="queueWaiting">--</strong>
+        </div>
+        <div class="queue-ov-row">
+          <span>Avg wait time</span>
+          <strong id="queueAvgWait">-- min</strong>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-actions">
+        <h3 class="quick-actions-title">Quick Actions</h3>
+        <button class="btn-quick" onclick="markAllReady()">
+          ✅ Mark All Preparing → Ready
+        </button>
+        <button class="btn-quick danger" onclick="clearCollected()">
+          🗑 Clear Collected Orders
+        </button>
+      </div>
+
+      <!-- Today's summary -->
+      <div class="today-summary">
+        <h3 class="quick-actions-title">Today's Summary</h3>
+        <div class="summary-row"><span>Orders served</span><strong id="todayServed">0</strong></div>
+        <div class="summary-row"><span>Revenue (est.)</span><strong id="todayRevenue">S$0.00</strong></div>
+        <div class="summary-row"><span>Avg order value</span><strong id="todayAvg">S$0.00</strong></div>
+      </div>
+
+      <!-- Announcement broadcast -->
+      <div class="broadcast-card">
+        <h3 class="quick-actions-title">📢 Broadcast to Students</h3>
+        <textarea id="broadcastMsg" class="broadcast-input" rows="2"
+          placeholder="e.g. Char Kway Teow sold out today!"></textarea>
+        <button class="btn-quick" onclick="sendBroadcast()" style="margin-top:8px">
+          Send Announcement
+        </button>
+        <div class="broadcast-history" id="broadcastHistory"></div>
+      </div>
+    </aside>
+
+  </div><!-- /stall-main -->
+
+  <!-- ===== ORDER DETAIL MODAL ===== -->
+  <div class="modal-overlay" id="orderDetailOverlay">
+    <div class="modal order-detail-modal">
+      <div class="modal-header">
+        <h2 id="orderDetailTitle">Order #041</h2>
+        <button class="close-btn" onclick="closeOrderDetail()">✕</button>
+      </div>
+      <div class="modal-body" id="orderDetailBody"></div>
+      <div class="modal-footer" id="orderDetailFooter"></div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/stall.js"></script>
+</body>
+</html>

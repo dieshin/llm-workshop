@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CanteenGo — Sign In</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="auth-body">
+
+  <!-- Brand header -->
+  <div class="auth-brand">
+    <span class="auth-brand-icon">🍱</span>
+    <span class="auth-brand-name">CanteenGo</span>
+    <p class="auth-brand-tagline">Skip the queue, not the flavour.</p>
+  </div>
+
+  <!-- Card -->
+  <div class="auth-card">
+
+    <!-- ── TAB BAR ── -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin"   onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab"        id="tabRegister" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- ══════════════════════════════
+         LOGIN PANEL
+    ══════════════════════════════ -->
+    <div class="auth-panel" id="panelLogin">
+      <h2 class="auth-heading">Welcome back 👋</h2>
+      <p class="auth-sub">Sign in to your CanteenGo account</p>
+
+      <form class="auth-form" onsubmit="handleLogin(event)">
+        <div class="field-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="you@school.edu.sg" autocomplete="email" required />
+        </div>
+        <div class="field-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required />
+            <button type="button" class="toggle-pw" onclick="togglePw('loginPassword', this)">👁</button>
+          </div>
+        </div>
+        <div class="auth-row">
+          <label class="check-label">
+            <input type="checkbox" id="rememberMe" /> Remember me
+          </label>
+          <button type="button" class="link-btn" onclick="switchTab('forgot')">Forgot password?</button>
+        </div>
+        <div class="auth-error" id="loginError"></div>
+        <button type="submit" class="btn-auth" id="loginBtn">Sign In</button>
+      </form>
+
+      <!-- Demo accounts hint -->
+      <div class="demo-hint">
+        <p class="demo-title">Demo accounts</p>
+        <div class="demo-accounts">
+          <button class="demo-fill" onclick="fillDemo('student@demo.sg','demo1234')">
+            🎒 Student login
+          </button>
+          <button class="demo-fill" onclick="fillDemo('staff@demo.sg','demo1234')">
+            👨‍🍳 Staff login
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         REGISTER PANEL
+    ══════════════════════════════ -->
+    <div class="auth-panel hidden" id="panelRegister">
+      <h2 class="auth-heading">Create account</h2>
+      <p class="auth-sub">Join CanteenGo and start ordering</p>
+
+      <form class="auth-form" onsubmit="handleRegister(event)">
+        <div class="field-group">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="e.g. Wei Ling Tan" maxlength="40" required />
+        </div>
+        <div class="field-group">
+          <label>Email</label>
+          <input type="email" id="regEmail" placeholder="you@school.edu.sg" autocomplete="email" required />
+        </div>
+        <div class="field-group">
+          <label>Role</label>
+          <div class="role-picker">
+            <label class="role-option active" id="roleStudent">
+              <input type="radio" name="role" value="student" checked onchange="selectRole(this)" />
+              <span class="role-icon">🎒</span>
+              <span class="role-label">Student</span>
+              <span class="role-desc">Order food, track queue</span>
+            </label>
+            <label class="role-option" id="roleStaff">
+              <input type="radio" name="role" value="staff" onchange="selectRole(this)" />
+              <span class="role-icon">👨‍🍳</span>
+              <span class="role-label">Stall Staff</span>
+              <span class="role-desc">Manage orders & queue</span>
+            </label>
+          </div>
+        </div>
+        <!-- Staff stall selector (hidden unless staff selected) -->
+        <div class="field-group" id="stallPickerGroup" style="display:none">
+          <label>Your Stall</label>
+          <select id="regStall">
+            <option value="rice">🍚 Rice Station</option>
+            <option value="noodles">🍜 Noodle Bar</option>
+            <option value="snacks">🥪 Snack Corner</option>
+            <option value="drinks">🧋 Drinks</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input type="password" id="regPassword" placeholder="Min. 6 characters" autocomplete="new-password" required minlength="6" />
+            <button type="button" class="toggle-pw" onclick="togglePw('regPassword', this)">👁</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Confirm Password</label>
+          <div class="input-wrap">
+            <input type="password" id="regConfirm" placeholder="Repeat password" autocomplete="new-password" required />
+            <button type="button" class="toggle-pw" onclick="togglePw('regConfirm', this)">👁</button>
+          </div>
+        </div>
+        <!-- Password strength bar -->
+        <div class="pw-strength-wrap" id="pwStrengthWrap" style="display:none">
+          <div class="pw-strength-bar">
+            <div class="pw-strength-fill" id="pwStrengthFill"></div>
+          </div>
+          <span class="pw-strength-label" id="pwStrengthLabel">Weak</span>
+        </div>
+        <div class="auth-error" id="registerError"></div>
+        <button type="submit" class="btn-auth" id="registerBtn">Create Account</button>
+      </form>
+    </div>
+
+    <!-- ══════════════════════════════
+         FORGOT PASSWORD PANEL
+    ══════════════════════════════ -->
+    <div class="auth-panel hidden" id="panelForgot">
+      <button class="back-btn" onclick="switchTab('login')">← Back to Sign In</button>
+      <h2 class="auth-heading">Reset password</h2>
+      <p class="auth-sub">Enter your email and we'll send you a reset link (simulated).</p>
+
+      <div id="forgotFormWrap">
+        <form class="auth-form" onsubmit="handleForgot(event)">
+          <div class="field-group">
+            <label>Email</label>
+            <input type="email" id="forgotEmail" placeholder="you@school.edu.sg" required />
+          </div>
+          <div class="auth-error" id="forgotError"></div>
+          <button type="submit" class="btn-auth">Send Reset Link</button>
+        </form>
+      </div>
+
+      <!-- Success state -->
+      <div id="forgotSuccess" class="forgot-success hidden">
+        <div class="forgot-success-icon">📬</div>
+        <h3>Check your inbox</h3>
+        <p id="forgotSuccessEmail"></p>
+        <p class="forgot-note">Didn't get it? <button class="link-btn" onclick="switchTab('forgot')">Try again</button></p>
+        <!-- Mock: show the "link" since we have no real email -->
+        <div class="mock-reset-box" id="mockResetBox"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         RESET PASSWORD PANEL
+    ══════════════════════════════ -->
+    <div class="auth-panel hidden" id="panelReset">
+      <h2 class="auth-heading">Set new password</h2>
+      <p class="auth-sub">Choose a strong password for your account.</p>
+      <form class="auth-form" onsubmit="handleReset(event)">
+        <div class="field-group">
+          <label>New Password</label>
+          <div class="input-wrap">
+            <input type="password" id="resetPassword" placeholder="Min. 6 characters" required minlength="6" />
+            <button type="button" class="toggle-pw" onclick="togglePw('resetPassword', this)">👁</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Confirm New Password</label>
+          <div class="input-wrap">
+            <input type="password" id="resetConfirm" placeholder="Repeat password" required />
+            <button type="button" class="toggle-pw" onclick="togglePw('resetConfirm', this)">👁</button>
+          </div>
+        </div>
+        <div class="auth-error" id="resetError"></div>
+        <button type="submit" class="btn-auth">Update Password</button>
+      </form>
+    </div>
+
+  </div><!-- /auth-card -->
+
+  <p class="auth-footer">By signing in you agree to CanteenGo's <a href="#">Terms</a> &amp; <a href="#">Privacy</a></p>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

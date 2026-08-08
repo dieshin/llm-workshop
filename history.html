@@ -23,6 +23,7 @@
       <button class="cart-btn" onclick="window.location='index.html'">
         <span class="cart-icon">🛒</span>
       </button>
+      <div id="navUserWrap" class="nav-user-wrap"></div>
     </div>
   </nav>
 
@@ -60,7 +61,15 @@
 
   <script src="js/data.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/history.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const s = requireAuth(['student']);
+      if (!s) return;
+      renderNavSession();
+    });
+  </script>
 </body>
 </html>
