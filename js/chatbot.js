@@ -1,114 +1,163 @@
 // =====================================================
 // CANTEENGO — AI ASSISTANT CHATBOT
-// Floating widget on all student pages.
-// Handles food Q&A, order help, refunds, escalation.
+// Clean DOM-based rendering — no raw HTML injection
 // =====================================================
 
 const BOT_NAME = 'CG Assist';
-const HUMAN_TRIGGER_PHRASES = ['human', 'agent', 'staff', 'person', 'real person', 'help me', 'not helpful', 'useless', 'speak to someone', 'talk to someone'];
 
-// ── KNOWLEDGE BASE ────────────────────────────────
+const HUMAN_TRIGGER_PHRASES = [
+  'human', 'agent', 'real person', 'speak to someone',
+  'talk to someone', 'connect me', 'escalate', 'not helpful', 'useless'
+];
+
 const BOT_KB = [
-  // Food recommendations
-  { patterns: ['healthy','low cal','diet','light'],
-    reply: "Try the **Wonton Noodle Soup** (480 cal) or **Egg Sandwich** (340 cal) — both light and filling. For drinks, **Iced Lemon Tea** is only 90 cal! 🥗" },
-  { patterns: ['spicy','kick','heat'],
-    reply: "Spicy picks: 🍛 Nasi Lemak Special, 🥘 Char Kway Teow, and 🥟 Curry Puff. All have a good kick!" },
-  { patterns: ['cheap','budget','cheapest','affordable','save'],
-    reply: "Best budget picks: 🥟 Curry Puff (S$1.20), 🫓 Roti Prata (S$1.80), 🧋 Teh Tarik (S$1.50). Under S$2 each! 💰" },
-  { patterns: ['fast','quick','fastest','5 min','five min'],
-    reply: "Fastest items: anything from **Drinks** or **Snack Corner** — they're ready in ~2 mins. Try Teh Tarik or Curry Puff. ⚡" },
-  { patterns: ['popular','best','recommend','good','nice'],
-    reply: "Top picks right now: 🍛 Nasi Lemak Special, 🥘 Char Kway Teow, 🍚 Chicken Rice, and 🥛 Milo Dinosaur. All crowd favourites! ⭐" },
-  { patterns: ['combo','bundle','deal','discount'],
-    reply: "Check out the **Study Break Combos** on the menu page — Brain Fuel, Quick Bite, Exam Warrior, and Afternoon Slump. Each saves you S$0.30–S$0.80! 📚" },
-  { patterns: ['vegetarian','vegan','no meat','meatless'],
-    reply: "Vegetarian-friendly: 🫓 Roti Prata, 🧋 Teh Tarik, 🍋 Iced Lemon Tea, 🥛 Milo Dinosaur, and 🥟 Curry Puff. Just note curry puff may have traces of meat. 🌿" },
-  { patterns: ['drink','drinks','thirsty','beverage'],
-    reply: "Drinks stall has: 🧋 Teh Tarik (S$1.50), 🥛 Milo Dinosaur (S$2.00), 🍋 Iced Lemon Tea (S$1.80). Hot or cold depending on mood! ☕" },
-  // Order help
-  { patterns: ['queue','wait','how long','waiting','time'],
-    reply: "Your wait time = your queue position × prep time. Drinks/Snacks: ~2 min per order. Rice/Noodles: ~3 min. Check **My Queue** for your live countdown! ⏱️" },
-  { patterns: ['cancel','cancell'],
-    reply: "Orders can't be cancelled once placed as they go straight to the stall. For urgent issues, please speak to the stall staff directly or use **Refund/Issue** below. 😔" },
-  { patterns: ['refund','wrong order','mistake','incorrect'],
-    reply: "Sorry about that! For a refund or wrong order:\n1. Go to **Orders** page\n2. Find the order\n3. Tell staff at the stall counter\n\nNeed more help? I can connect you to our support team. Just say **'connect me to support'**. 🔄" },
-  { patterns: ['points','loyalty','reward'],
-    reply: "You earn points on every order — tap the 🏅 in the navbar to see your balance. **50 pts = S$1 off** at checkout using the redemption slider. Spin the wheel daily for bonus points! 🎰" },
-  { patterns: ['spin','wheel','lucky'],
-    reply: "The 🎰 Daily Lucky Spin gives you one spin per day. Win S$0.30–S$2.00 off, or bonus points (+20/+50). Tap the 🏅 badge in the top nav to spin! 🍀" },
-  { patterns: ['password','forgot','login','account','sign in','register'],
-    reply: "For account issues: go to the **Sign In** page → click **Forgot password?** to get a reset link. If you're stuck, say **'connect me to support'** and I'll escalate to the team. 🔑" },
-  { patterns: ['hours','open','close','timing'],
-    reply: "Canteen is typically open 7am–8pm on weekdays, 8am–4pm on weekends. Individual stalls may vary — check the **Stall Busyness** panel on the menu page. 🕐" },
-  // Escalation
-  { patterns: ['connect me to support','human support','speak to','talk to','real agent','escalate'],
-    reply: null, type: 'escalate' },
+  { p: ['healthy','low cal','diet','light'],
+    r: 'Try the Wonton Noodle Soup (480 cal) or Egg Sandwich (340 cal) — both light and filling. Iced Lemon Tea is only 90 cal! 🥗' },
+  { p: ['spicy','kick','heat'],
+    r: 'Spicy picks: 🍛 Nasi Lemak Special, 🥘 Char Kway Teow, 🥟 Curry Puff. All have a good kick!' },
+  { p: ['cheap','budget','affordable','save money'],
+    r: 'Best budget picks: 🥟 Curry Puff (S$1.20), 🫓 Roti Prata (S$1.80), 🧋 Teh Tarik (S$1.50). All under S$2! 💰' },
+  { p: ['fast','quick','fastest','2 min','5 min'],
+    r: 'Fastest items come from Drinks or Snack Corner — ready in ~2 mins. Try Teh Tarik or Curry Puff. ⚡' },
+  { p: ['popular','best','recommend','what should i eat','good','nice'],
+    r: 'Top picks: 🍛 Nasi Lemak Special, 🥘 Char Kway Teow, 🍚 Chicken Rice, 🥛 Milo Dinosaur. All crowd favourites! ⭐' },
+  { p: ['combo','bundle','deal','discount'],
+    r: 'Check the Study Break Combos on the menu page — Brain Fuel, Quick Bite, Exam Warrior, Afternoon Slump. Each saves S$0.30–S$0.80! 📚' },
+  { p: ['vegetarian','vegan','no meat','meatless'],
+    r: 'Vegetarian-friendly: 🫓 Roti Prata, 🧋 Teh Tarik, 🍋 Iced Lemon Tea, 🥛 Milo Dinosaur, 🥟 Curry Puff. 🌿' },
+  { p: ['drink','drinks','thirsty','beverage'],
+    r: 'Drinks stall: 🧋 Teh Tarik (S$1.50), 🥛 Milo Dinosaur (S$2.00), 🍋 Iced Lemon Tea (S$1.80). Hot or cold! ☕' },
+  { p: ['queue','wait','how long','waiting time'],
+    r: 'Wait time = queue position × prep time. Drinks/Snacks: ~2 min/order. Rice/Noodles: ~3 min/order. Check My Queue for your live countdown! ⏱️' },
+  { p: ['cancel'],
+    r: "Orders can't be cancelled once placed — they go straight to the stall. For urgent cases speak to staff directly. 😔" },
+  { p: ['refund','wrong order','mistake','incorrect'],
+    r: 'For a refund or wrong order: go to Orders page, find the order, then speak to the stall counter. Need more help? Say "connect me to support". 🔄' },
+  { p: ['points','loyalty','reward'],
+    r: 'Earn points on every order. 50 pts = S$1 off at checkout using the redemption slider. Spin the daily wheel for bonus points! 🎰' },
+  { p: ['spin','wheel','lucky spin'],
+    r: 'Daily Lucky Spin: one spin per day. Win S$0.30–S$2.00 off or +20/+50 bonus points. Tap the 🏅 in the nav to spin! 🍀' },
+  { p: ['password','forgot','login','account','sign in'],
+    r: 'For account issues: go to Sign In → Forgot password? for a reset link. Still stuck? Say "connect me to support". 🔑' },
+  { p: ['edit profile','change name','update profile','profile'],
+    r: 'You can edit your profile from the nav — tap your avatar/name at the top right and select Edit Profile. 👤' },
+  { p: ['hours','open','close','timing'],
+    r: 'Canteen is typically open 7am–8pm weekdays, 8am–4pm weekends. Check the Stall Busyness panel on the menu page for live status. 🕐' },
 ];
 
 function matchKB(input) {
-  const lower = input.toLowerCase();
-  for (const entry of BOT_KB) {
-    if (entry.patterns.some(p => lower.includes(p))) return entry;
+  const low = input.toLowerCase();
+  for (const e of BOT_KB) {
+    if (e.p.some(p => low.includes(p))) return e.r;
   }
   return null;
 }
 
-function isEscalateRequest(input) {
-  const lower = input.toLowerCase();
-  return HUMAN_TRIGGER_PHRASES.some(p => lower.includes(p));
+function isEscalate(input) {
+  return HUMAN_TRIGGER_PHRASES.some(p => input.toLowerCase().includes(p));
 }
+
+// ── STATE ─────────────────────────────────────────
+let chatOpen = false;
+let isEscalated = false;
 
 // ── BUILD WIDGET ──────────────────────────────────
 function buildChatbot() {
   if (document.getElementById('chatbotWidget')) return;
-  const el = document.createElement('div');
-  el.id = 'chatbotWidget';
-  el.innerHTML = `
-    <!-- Floating button -->
-    <button class="chat-fab" id="chatFab" onclick="toggleChatbot()" aria-label="Open Assistant">
-      <span class="chat-fab-icon" id="chatFabIcon">💬</span>
-      <span class="chat-fab-badge hidden" id="chatFabBadge">1</span>
-    </button>
 
-    <!-- Chat window -->
-    <div class="chat-window hidden" id="chatWindow">
-      <div class="chat-header">
-        <div class="chat-header-info">
-          <div class="chat-avatar">🤖</div>
-          <div>
-            <div class="chat-title">${BOT_NAME}</div>
-            <div class="chat-subtitle" id="chatStatus">Online · replies instantly</div>
-          </div>
-        </div>
-        <button class="chat-close" onclick="toggleChatbot()">✕</button>
+  const widget = document.createElement('div');
+  widget.id = 'chatbotWidget';
+  document.body.appendChild(widget);
+
+  // FAB
+  const fab = document.createElement('button');
+  fab.className = 'chat-fab';
+  fab.id = 'chatFab';
+  fab.setAttribute('aria-label', 'Open Assistant');
+  fab.innerHTML = '<span id="chatFabIcon">💬</span>';
+  const badge = document.createElement('span');
+  badge.id = 'chatFabBadge';
+  badge.className = 'chat-fab-badge hidden';
+  badge.textContent = '1';
+  fab.appendChild(badge);
+  fab.addEventListener('click', toggleChatbot);
+  widget.appendChild(fab);
+
+  // Window
+  const win = document.createElement('div');
+  win.className = 'chat-window hidden';
+  win.id = 'chatWindow';
+
+  // Header
+  const hdr = document.createElement('div');
+  hdr.className = 'chat-header';
+  hdr.innerHTML = `
+    <div class="chat-header-info">
+      <div class="chat-avatar-wrap">
+        <div class="chat-avatar-dot"></div>
+        🤖
       </div>
-      <div class="chat-messages" id="chatMessages"></div>
-      <div class="chat-quick-btns" id="chatQuickBtns">
-        <button class="chat-quick" onclick="sendQuick('What should I eat?')">🍽️ Food recs</button>
-        <button class="chat-quick" onclick="sendQuick('How do points work?')">🏅 Points</button>
-        <button class="chat-quick" onclick="sendQuick('I want a refund')">💸 Refund</button>
-        <button class="chat-quick" onclick="sendQuick('How long is my wait?')">⏱️ Wait time</button>
-      </div>
-      <div class="chat-input-row">
-        <input class="chat-input" id="chatInput" type="text" placeholder="Ask me anything…" onkeydown="if(event.key==='Enter')sendChat()" maxlength="200" />
-        <button class="chat-send" onclick="sendChat()">➤</button>
+      <div>
+        <div class="chat-title">${BOT_NAME}</div>
+        <div class="chat-subtitle" id="chatStatus">Online · replies instantly</div>
       </div>
     </div>`;
-  document.body.appendChild(el);
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'chat-close';
+  closeBtn.textContent = '✕';
+  closeBtn.addEventListener('click', toggleChatbot);
+  hdr.appendChild(closeBtn);
+  win.appendChild(hdr);
 
-  // Greet after 2s
+  // Messages
+  const msgs = document.createElement('div');
+  msgs.className = 'chat-messages';
+  msgs.id = 'chatMessages';
+  win.appendChild(msgs);
+
+  // Quick buttons
+  const qb = document.createElement('div');
+  qb.className = 'chat-quick-btns';
+  qb.id = 'chatQuickBtns';
+  const quickOptions = [
+    { icon: '🍽️', text: 'What should I eat?'  },
+    { icon: '🏅', text: 'How do points work?' },
+    { icon: '💸', text: 'I need a refund'     },
+    { icon: '⏱️', text: 'How long is my wait?' },
+  ];
+  quickOptions.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'chat-quick';
+    btn.textContent = `${opt.icon} ${opt.text}`;
+    btn.addEventListener('click', () => sendMessage(opt.text));
+    qb.appendChild(btn);
+  });
+  win.appendChild(qb);
+
+  // Input row
+  const inputRow = document.createElement('div');
+  inputRow.className = 'chat-input-row';
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.className = 'chat-input'; inp.id = 'chatInput';
+  inp.placeholder = 'Ask me anything…'; inp.maxLength = 200;
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(inp.value); });
+  const sendBtn = document.createElement('button');
+  sendBtn.className = 'chat-send'; sendBtn.textContent = '➤';
+  sendBtn.addEventListener('click', () => sendMessage(inp.value));
+  inputRow.appendChild(inp);
+  inputRow.appendChild(sendBtn);
+  win.appendChild(inputRow);
+
+  widget.appendChild(win);
+
+  // Greet after 2.5s
   setTimeout(() => {
-    const session = typeof AuthStore !== 'undefined' ? AuthStore.getSession() : null;
-    const name = session ? session.name.split(' ')[0] : 'there';
-    botMessage(`Hey ${name}! 👋 I'm ${BOT_NAME}. Ask me about the menu, your order, points, or refunds — or just say **"What should I eat?"**`);
-    showFabBadge();
-  }, 2000);
+    const session = (typeof AuthStore !== 'undefined') ? AuthStore.getSession() : null;
+    const firstName = session ? session.name.split(' ')[0] : 'there';
+    addBotMsg(`Hey ${firstName}! 👋 I'm ${BOT_NAME}. Ask me about the menu, your order, points, refunds — or just tap a button below!`);
+    showBadge();
+  }, 2500);
 }
-
-let chatOpen = false;
-let isEscalated = false;
-const chatLog = [];
 
 function toggleChatbot() {
   chatOpen = !chatOpen;
@@ -116,122 +165,123 @@ function toggleChatbot() {
   const icon = document.getElementById('chatFabIcon');
   if (win)  win.classList.toggle('hidden', !chatOpen);
   if (icon) icon.textContent = chatOpen ? '✕' : '💬';
-  if (chatOpen) hideFabBadge();
+  if (chatOpen) hideBadge();
 }
 
-function showFabBadge() {
+function showBadge() {
   if (chatOpen) return;
   const b = document.getElementById('chatFabBadge');
   if (b) b.classList.remove('hidden');
 }
-function hideFabBadge() {
+function hideBadge() {
   const b = document.getElementById('chatFabBadge');
   if (b) b.classList.add('hidden');
 }
 
-// ── MESSAGES ─────────────────────────────────────
-function botMessage(text, extra = '') {
-  appendMessage('bot', text, extra);
-}
-function userMessage(text) {
-  appendMessage('user', text);
-}
-
-function appendMessage(role, text, extra = '') {
+// ── MESSAGE BUILDERS (DOM-only, no innerHTML injection) ──
+function addBotMsg(text, extras) {
   const msgs = document.getElementById('chatMessages'); if (!msgs) return;
-  const div = document.createElement('div');
-  div.className = `chat-msg chat-msg-${role}`;
-  // Convert **bold** markdown
-  const html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-  div.innerHTML = `<div class="chat-bubble">${html}</div>${extra}`;
-  msgs.appendChild(div);
+  const row = document.createElement('div');
+  row.className = 'chat-msg chat-msg-bot';
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  // Safe bold markdown
+  bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  row.appendChild(bubble);
+  if (extras) row.appendChild(extras);
+  msgs.appendChild(row);
   msgs.scrollTop = msgs.scrollHeight;
-  chatLog.push({ role, text });
 }
 
-function typingIndicator(show) {
+function addUserMsg(text) {
   const msgs = document.getElementById('chatMessages'); if (!msgs) return;
-  const existing = document.getElementById('chatTyping');
-  if (show && !existing) {
-    const d = document.createElement('div');
-    d.id = 'chatTyping'; d.className = 'chat-msg chat-msg-bot';
-    d.innerHTML = `<div class="chat-bubble chat-typing"><span></span><span></span><span></span></div>`;
-    msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
-  } else if (!show && existing) { existing.remove(); }
+  const row = document.createElement('div');
+  row.className = 'chat-msg chat-msg-user';
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.textContent = text;
+  row.appendChild(bubble);
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
 }
+
+function showTyping() {
+  const msgs = document.getElementById('chatMessages'); if (!msgs) return;
+  if (document.getElementById('chatTyping')) return;
+  const row = document.createElement('div');
+  row.id = 'chatTyping'; row.className = 'chat-msg chat-msg-bot';
+  row.innerHTML = '<div class="chat-bubble chat-typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(row); msgs.scrollTop = msgs.scrollHeight;
+}
+function hideTyping() { const el = document.getElementById('chatTyping'); if (el) el.remove(); }
 
 // ── SEND ─────────────────────────────────────────
-function sendQuick(text) {
+function sendMessage(text) {
+  if (!text || !text.trim()) return;
   const inp = document.getElementById('chatInput');
-  if (inp) inp.value = text;
-  sendChat();
-}
+  if (inp) inp.value = '';
+  text = text.trim();
+  addUserMsg(text);
 
-function sendChat() {
-  const inp = document.getElementById('chatInput'); if (!inp) return;
-  const text = inp.value.trim(); if (!text) return;
-  inp.value = '';
-  userMessage(text);
-
-  // Hide quick buttons after first message
+  // Hide quick btns after first use
   const qb = document.getElementById('chatQuickBtns');
   if (qb) qb.style.display = 'none';
 
-  typingIndicator(true);
+  showTyping();
   setTimeout(() => {
-    typingIndicator(false);
-    processMessage(text);
-  }, 700 + Math.random() * 500);
+    hideTyping();
+    respond(text);
+  }, 600 + Math.random() * 400);
 }
 
-function processMessage(text) {
-  if (isEscalated) {
-    handleEscalated(text); return;
-  }
+function respond(text) {
+  if (isEscalated) { respondEscalated(text); return; }
+  if (isEscalate(text)) { showEscalation(); return; }
 
-  // Check escalation request
-  if (isEscalateRequest(text)) {
-    escalateToHuman(); return;
-  }
+  const reply = matchKB(text);
+  if (reply) { addBotMsg(reply); return; }
 
-  const match = matchKB(text);
-  if (match) {
-    if (match.type === 'escalate') { escalateToHuman(); return; }
-    botMessage(match.reply);
-    return;
-  }
-
-  // Fallback
-  botMessage(
-    "I'm not sure about that one! Here's what I can help with:",
-    `<div class="chat-suggest-btns">
-      <button class="chat-quick" onclick="sendQuick('What\\'s the healthiest option?')">🥗 Healthy food</button>
-      <button class="chat-quick" onclick="sendQuick('I want a refund')">💸 Refund</button>
-      <button class="chat-quick" onclick="sendQuick('Connect me to support')">🧑‍💼 Human support</button>
-    </div>`
-  );
+  // Fallback with suggestion buttons
+  const suggestions = document.createElement('div');
+  suggestions.className = 'chat-suggest-btns';
+  [['🥗', 'Healthiest option?'], ['💸', 'I need a refund'], ['🧑‍💼', 'Talk to support']].forEach(([icon, label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'chat-quick';
+    btn.textContent = `${icon} ${label}`;
+    btn.addEventListener('click', () => sendMessage(label));
+    suggestions.appendChild(btn);
+  });
+  addBotMsg("I'm not sure about that one! Here's what I can help with:", suggestions);
 }
 
-// ── ESCALATION ───────────────────────────────────
-function escalateToHuman() {
-  isEscalated = false; // Will set true after user confirms
-  botMessage(
-    "I'll connect you to our **human support team** now. 🧑‍💼\n\nPlease briefly describe your issue and someone will follow up via your registered email.",
-    `<div class="chat-escalate-form">
-      <textarea id="escalateMsg" class="chat-escalate-input" rows="2" placeholder="Describe your issue…" maxlength="300"></textarea>
-      <button class="chat-quick primary" onclick="submitEscalation()">📨 Submit to Support</button>
-    </div>`
-  );
+function showEscalation() {
+  const form = document.createElement('div');
+  form.className = 'chat-escalate-form';
+
+  const ta = document.createElement('textarea');
+  ta.className = 'chat-escalate-input';
+  ta.rows = 2; ta.maxLength = 300;
+  ta.placeholder = 'Describe your issue briefly…';
+  form.appendChild(ta);
+
+  const submitBtn = document.createElement('button');
+  submitBtn.className = 'chat-quick primary';
+  submitBtn.textContent = '📨 Submit to Support';
+  submitBtn.addEventListener('click', () => {
+    const msg = ta.value.trim();
+    if (!msg) { ta.style.border = '2px solid var(--red)'; return; }
+    submitEscalation(msg);
+    form.remove();
+  });
+  form.appendChild(submitBtn);
+
+  addBotMsg("I'll connect you to our support team. 🧑‍💼\nBriefly describe your issue and someone will follow up via your email:", form);
   const status = document.getElementById('chatStatus');
   if (status) status.textContent = 'Connecting to support…';
 }
 
-function submitEscalation() {
-  const msgEl = document.getElementById('escalateMsg');
-  const msg   = msgEl ? msgEl.value.trim() : '';
-  if (!msg) { showToast('Please describe your issue first.'); return; }
-
-  const session = typeof AuthStore !== 'undefined' ? AuthStore.getSession() : null;
+function submitEscalation(msg) {
+  const session = (typeof AuthStore !== 'undefined') ? AuthStore.getSession() : null;
   const ticket = {
     id:      'TKT-' + Date.now().toString(36).toUpperCase(),
     email:   session?.email || 'unknown',
@@ -239,24 +289,19 @@ function submitEscalation() {
     message: msg,
     at:      Date.now()
   };
-  const tickets = JSON.parse(localStorage.getItem('cg_support_tickets') || '[]');
-  tickets.unshift(ticket);
-  localStorage.setItem('cg_support_tickets', JSON.stringify(tickets));
-
+  const all = JSON.parse(localStorage.getItem('cg_support_tickets') || '[]');
+  all.unshift(ticket);
+  localStorage.setItem('cg_support_tickets', JSON.stringify(all));
   isEscalated = true;
-  botMessage(
-    `✅ Ticket **${ticket.id}** submitted!\n\nOur support team will reach you at **${ticket.email}** within 24 hours. Is there anything else I can help with?`
-  );
+  addBotMsg(`✅ Ticket **${ticket.id}** submitted! Our team will reach you at **${ticket.email}** within 24 hours. Anything else I can help with?`);
   const status = document.getElementById('chatStatus');
-  if (status) status.textContent = 'Ticket submitted';
+  if (status) status.textContent = 'Ticket submitted ✓';
 }
 
-function handleEscalated(text) {
-  // After escalation, still try KB
-  const match = matchKB(text);
-  if (match && match.type !== 'escalate') { botMessage(match.reply); return; }
-  botMessage("Your support ticket is already logged. Our team will reach out soon! Anything else I can help with in the meantime? 😊");
+function respondEscalated(text) {
+  const reply = matchKB(text);
+  if (reply) { addBotMsg(reply); return; }
+  addBotMsg('Your support ticket is already logged. The team will reach out soon! Anything else I can help with? 😊');
 }
 
-// ── INIT ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', buildChatbot);

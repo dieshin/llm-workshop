@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Profile — CanteenGo</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🍱</span>
+      <span class="brand-name">CanteenGo</span>
+    </div>
+    <div class="nav-links" id="profileNavLinks"></div>
+    <div class="nav-right" id="navUserWrap"></div>
+  </nav>
+
+  <main class="profile-page">
+    <div class="profile-card">
+
+      <!-- Avatar -->
+      <div class="profile-avatar-section">
+        <div class="profile-avatar-big" id="profileAvatarBig">AL</div>
+        <div>
+          <div class="profile-name-display" id="profileNameDisplay">Loading…</div>
+          <div class="profile-role-display" id="profileRoleDisplay"></div>
+        </div>
+      </div>
+
+      <!-- ── PROFILE FORM ── -->
+      <form class="profile-form" onsubmit="saveProfile(event)">
+
+        <div class="profile-section-label">Account Info</div>
+
+        <div class="field-group">
+          <label>Full Name</label>
+          <input type="text" id="profileName" maxlength="40" required placeholder="Your full name" />
+        </div>
+
+        <div class="field-group">
+          <label>Email</label>
+          <input type="email" id="profileEmail" required placeholder="your@email.com" />
+        </div>
+
+        <!-- Staff only: stall selector -->
+        <div id="stallSection" style="display:none">
+          <div class="profile-section-label" style="margin-top:var(--sp-5)">Stall Settings</div>
+          <div class="field-group">
+            <label>Your Stall</label>
+            <div class="stall-selector" id="stallSelector">
+              <label class="stall-sel-option" data-stall="rice">
+                <input type="radio" name="profileStall" value="rice" />
+                <span class="stall-sel-icon">🍚</span>
+                <span class="stall-sel-name">Rice Station</span>
+              </label>
+              <label class="stall-sel-option" data-stall="noodles">
+                <input type="radio" name="profileStall" value="noodles" />
+                <span class="stall-sel-icon">🍜</span>
+                <span class="stall-sel-name">Noodle Bar</span>
+              </label>
+              <label class="stall-sel-option" data-stall="snacks">
+                <input type="radio" name="profileStall" value="snacks" />
+                <span class="stall-sel-icon">🥪</span>
+                <span class="stall-sel-name">Snack Corner</span>
+              </label>
+              <label class="stall-sel-option" data-stall="drinks">
+                <input type="radio" name="profileStall" value="drinks" />
+                <span class="stall-sel-icon">🧋</span>
+                <span class="stall-sel-name">Drinks</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div id="profileSaveError" class="auth-error" style="margin-top:var(--sp-3)"></div>
+        <button type="submit" class="btn-auth" style="margin-top:var(--sp-4)">Save Changes</button>
+      </form>
+
+      <!-- ── CHANGE PASSWORD ── -->
+      <div class="profile-section-divider"></div>
+      <div class="profile-section-label">Change Password</div>
+      <form class="profile-form" onsubmit="changePassword(event)">
+        <div class="field-group">
+          <label>Current Password</label>
+          <div class="input-wrap">
+            <input type="password" id="currentPw" placeholder="Current password" required />
+            <button type="button" class="toggle-pw" onclick="togglePw('currentPw',this)">👁</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>New Password</label>
+          <div class="input-wrap">
+            <input type="password" id="newPw" placeholder="Min. 6 characters" required minlength="6" />
+            <button type="button" class="toggle-pw" onclick="togglePw('newPw',this)">👁</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Confirm New Password</label>
+          <div class="input-wrap">
+            <input type="password" id="confirmPw" placeholder="Repeat new password" required />
+            <button type="button" class="toggle-pw" onclick="togglePw('confirmPw',this)">👁</button>
+          </div>
+        </div>
+        <div id="pwChangeError" class="auth-error" style="margin-top:var(--sp-3)"></div>
+        <button type="submit" class="btn-auth secondary" style="margin-top:var(--sp-4)">Update Password</button>
+      </form>
+
+      <!-- ── DANGER ZONE ── -->
+      <div class="profile-section-divider"></div>
+      <div class="profile-section-label danger-label">Danger Zone</div>
+      <button class="btn-danger-outline" onclick="deleteAccount()">🗑 Delete Account</button>
+
+    </div>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

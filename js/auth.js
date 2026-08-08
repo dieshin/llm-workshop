@@ -161,6 +161,7 @@ function renderNavSession() {
       </div>
       ${session.role === 'staff' ? `<a class="user-menu-item" href="stall.html">📋 Stall Dashboard</a>` : ''}
       ${session.role === 'student' ? `<a class="user-menu-item" href="history.html">📦 My Orders</a>` : ''}
+      <a class="user-menu-item" href="profile.html">✏️ Edit Profile</a>
       <button class="user-menu-item danger" onclick="logout()">🚪 Sign Out</button>
     </div>`;
 }
