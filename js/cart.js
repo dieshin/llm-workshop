@@ -79,6 +79,28 @@ function renderCartDrawer() {
   const total = Store.cartTotal(cart);
   const totalEl = document.getElementById('cartTotal');
   if (totalEl) totalEl.textContent = Store.formatPrice(total);
+
+  // Nutrition bar
+  const nutBar = document.getElementById('cartNutritionBar');
+  if (nutBar) {
+    const totalCal = Store.cartCalories(cart);
+    const protein = cart.reduce((s, c) => { const m = MENU_ITEMS.find(i => i.id === c.id); return s + (m ? m.nutrition.protein * c.qty : 0); }, 0);
+    const carbs   = cart.reduce((s, c) => { const m = MENU_ITEMS.find(i => i.id === c.id); return s + (m ? m.nutrition.carbs * c.qty : 0); }, 0);
+    const fat     = cart.reduce((s, c) => { const m = MENU_ITEMS.find(i => i.id === c.id); return s + (m ? m.nutrition.fat * c.qty : 0); }, 0);
+    const ptsEarn = Store.cartPointsEarned(cart);
+    nutBar.innerHTML = `
+      <div class="nutrition-row">
+        <span class="nutrition-title">Nutrition estimate</span>
+        <span class="nutrition-cal">🔥 ${totalCal} cal</span>
+      </div>
+      <div class="nutrition-macros">
+        <span class="macro-pill protein">P ${protein}g</span>
+        <span class="macro-pill carbs">C ${carbs}g</span>
+        <span class="macro-pill fat">F ${fat}g</span>
+      </div>
+      <div style="margin-top:6px; font-size:10px; color:var(--orange); font-weight:600;">+${ptsEarn} pts on this order</div>`;
+  }
+
   if (footerEl) footerEl.style.display = 'block';
 }
 

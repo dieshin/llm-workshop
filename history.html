@@ -15,19 +15,37 @@
       <span class="brand-name">CanteenGo</span>
     </div>
     <div class="nav-links">
-      <a href="index.html" class="nav-link" data-page="menu">Menu</a>
-      <a href="queue.html" class="nav-link" data-page="queue">My Queue</a>
-      <a href="history.html" class="nav-link active" data-page="history">Orders</a>
+      <a href="index.html" class="nav-link">Menu</a>
+      <a href="queue.html" class="nav-link">My Queue</a>
+      <a href="history.html" class="nav-link active">Orders</a>
     </div>
-    <button class="cart-btn" onclick="window.location='index.html'">
-      <span class="cart-icon">🛒</span>
-    </button>
+    <div class="nav-right">
+      <button class="cart-btn" onclick="window.location='index.html'">
+        <span class="cart-icon">🛒</span>
+      </button>
+    </div>
   </nav>
 
   <main class="history-page">
     <div class="page-header">
-      <h1>Order History</h1>
+      <h1>Orders</h1>
       <button class="btn-clear-history" onclick="clearHistory()">Clear All</button>
+    </div>
+
+    <!-- Stats summary -->
+    <div class="history-stats" id="historyStats" style="display:none">
+      <div class="history-stat-card">
+        <span class="history-stat-value" id="statTotalSpent">S$0</span>
+        <span class="history-stat-label">Total Spent</span>
+      </div>
+      <div class="history-stat-card">
+        <span class="history-stat-value" id="statTotalOrders">0</span>
+        <span class="history-stat-label">Orders</span>
+      </div>
+      <div class="history-stat-card">
+        <span class="history-stat-value" id="statTotalPts">0</span>
+        <span class="history-stat-label">Points</span>
+      </div>
     </div>
 
     <div id="historyEmpty" class="empty-state" style="display:none">
